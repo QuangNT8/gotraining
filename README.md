@@ -1,0 +1,2 @@
+# gotraining
+golang training project
