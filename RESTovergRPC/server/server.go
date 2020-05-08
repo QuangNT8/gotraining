@@ -67,7 +67,7 @@ func StartHTTP() {
 		log.Fatal(err)
 	}
 	log.Println("REST server ready...")
-	err = http.ListenAndServe("localhost:8080", rmux)
+	err = http.ListenAndServe("localhost:8082", rmux)
 	if err != nil {
 		log.Fatal(err)
 	}

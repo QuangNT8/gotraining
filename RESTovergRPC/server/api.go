@@ -3,6 +3,7 @@ package server
 import (
 	"RESTovergRPC/backend"
 	api "RESTovergRPC/directory"
+	"fmt"
 
 	"golang.org/x/net/context"
 )
@@ -27,6 +28,8 @@ func (d *Directory) CreateDirectory(ctx context.Context, req *api.DirectoryReque
 
 	success, err := d.backend.CreateDirectory(req.DirectoryName)
 
+	fmt.Println(req.DirectoryName)
+
 	return &api.SuccessResponse{Success: success}, err
 }
 
@@ -49,6 +52,11 @@ func (d *Directory) SearchEntry(ctx context.Context, req *api.SearchEntryRequest
 	resp := &api.SearchEntriesResponse{Entries: result}
 
 	return resp, nil
+}
+
+func (d *Directory) Echo(ctx context.Context, req *api.EchoRequest) (*api.EchoResponse, error) {
+
+	return nil, nil
 }
 
 // Cleanup

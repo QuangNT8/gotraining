@@ -31,6 +31,7 @@ func New(dburl map[string]string) backend.Backend {
 
 // CreateDirectory
 func (s *storer) CreateDirectory(name string) (string, error) {
+	fmt.Println("CreateDirectory", name)
 	s.db.Create(&Directory{DirectoryName: name})
 	return "OK", nil
 }
