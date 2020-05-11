@@ -35,6 +35,7 @@ func Init() {
 }
 
 func main() {
+	var wg sync.WaitGroup
 	ctx := context.Background()
 	// for test locally with go run main.go
 	Init()
@@ -45,13 +46,12 @@ func main() {
 		"Type":     dbname,
 		"Password": password,
 	}
-	go server.StartGRPC(ctx, dburl)
-
-	go server.StartHTTP()
+	wg.Add(1)
+	go server.StartGRPC(&wg, ctx, dburl)
+	wg.Add(1)
+	go server.StartHTTP(&wg)
 
 	// Block forever
-	var wg sync.WaitGroup
-	wg.Add(1)
 	wg.Wait()
 
 }

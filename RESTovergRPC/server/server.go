@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 
 	"RESTovergRPC/directory"
 
@@ -14,7 +15,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func StartGRPC(ctx context.Context, dbUrl map[string]string) {
+func StartGRPC(wg *sync.WaitGroup, ctx context.Context, dbUrl map[string]string) {
 	listen, err := net.Listen("tcp", "localhost:5566")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -31,14 +32,16 @@ func StartGRPC(ctx context.Context, dbUrl map[string]string) {
 	// graceful shutdown
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
+	_, cancel := context.WithCancel(ctx)
+	defer cancel()
 	go func() {
 		for range c {
 			// sig is a ^C, handle it
 			log.Println("shutting down gRPC server...")
 
 			grpcServer.GracefulStop()
-
-			<-ctx.Done()
+			cancel()
+			wg.Done()
 		}
 	}()
 
@@ -47,7 +50,7 @@ func StartGRPC(ctx context.Context, dbUrl map[string]string) {
 	grpcServer.Serve(listen)
 }
 
-func StartHTTP() {
+func StartHTTP(wg *sync.WaitGroup) {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -66,8 +69,25 @@ func StartHTTP() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// graceful shutdown
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	server := http.Server{
+		Addr:    "localhost:8081",
+		Handler: rmux,
+	}
+
+	go func() {
+		for range c {
+			// sig is a ^C, handle it
+			log.Println("shutting down gRPC server...")
+			server.Shutdown(ctx)
+			cancel()
+			wg.Done()
+		}
+	}()
 	log.Println("REST server ready...")
-	err = http.ListenAndServe("localhost:8082", rmux)
+	err = server.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 	}

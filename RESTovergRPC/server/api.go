@@ -56,7 +56,9 @@ func (d *Directory) SearchEntry(ctx context.Context, req *api.SearchEntryRequest
 
 func (d *Directory) Echo(ctx context.Context, req *api.EchoRequest) (*api.EchoResponse, error) {
 
-	return nil, nil
+	success := "ok"
+
+	return &api.EchoResponse{EchoSuccess: success}, nil
 }
 
 // Cleanup
