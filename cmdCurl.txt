@@ -1,0 +1,3 @@
+curl -X POST -d'{"directory_name": "test"}' http0/api/v1/createDirectory
+
+curl -X POST "http0/api/v1/createDirectory"
