@@ -21,6 +21,13 @@ import "google/api/annotations.proto";
 // Directory service
 service Directory {
 
+    rpc GetUser(GetUserRequest) returns (GetUserResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/getUser"
+            body: "*"
+        };
+    }
+
     rpc Echo(EchoRequest) returns (EchoResponse) {
         option (google.api.http) = {
             post: "/api/v1/echo/{echo_inputdata}"
@@ -86,4 +93,12 @@ message EchoRequest {
 
 message EchoResponse {
     string echo_success = 1;
+}
+
+message GetUserRequest {
+    string command = 1;
+}
+
+message GetUserResponse {
+    string success = 1;    
 }

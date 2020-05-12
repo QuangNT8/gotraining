@@ -20,6 +20,8 @@ import (
 
 // Backend stores and retrieves entities.
 type Backend interface {
+	// get user
+	GetUser(cmd string) (string, error)
 
 	// CreateDirectory
 	CreateDirectory(name string) (string, error)

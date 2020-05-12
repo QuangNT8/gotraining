@@ -37,7 +37,7 @@ func (d *Directory) CreateDirectory(ctx context.Context, req *api.DirectoryReque
 func (d *Directory) AddEntry(ctx context.Context, req *api.EntryRequest) (*api.SuccessResponse, error) {
 
 	success, err := d.backend.AddEntry(req)
-
+	fmt.Println(req)
 	return &api.SuccessResponse{Success: success}, err
 }
 
@@ -57,8 +57,17 @@ func (d *Directory) SearchEntry(ctx context.Context, req *api.SearchEntryRequest
 func (d *Directory) Echo(ctx context.Context, req *api.EchoRequest) (*api.EchoResponse, error) {
 
 	success := "ok"
-
+	fmt.Println(req)
 	return &api.EchoResponse{EchoSuccess: success}, nil
+}
+
+func (d *Directory) GetUser(ctx context.Context, req *api.GetUserRequest) (*api.GetUserResponse, error) {
+
+	success, err := d.backend.GetUser(req.Command)
+
+	fmt.Println(req.Command)
+
+	return &api.GetUserResponse{Success: success}, err
 }
 
 // Cleanup
