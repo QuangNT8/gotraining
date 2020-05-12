@@ -1,3 +1,12 @@
-curl -X POST -d'{"directory_name": "test"}' http0/api/v1/createDirectory
 
-curl -X POST "http0/api/v1/createDirectory"
+curl -X POST -d'{"directory_name": "test"}' http://localhost:8081/api/v1/createDirectory
+
+curl -X POST -d'{"directory_name": "test", "entry":{"name": "abc","last_name": "cde","ph_number": "090123456"}}' http://localhost:8081/api/v1/addEntry
+
+curl -X POST "http://localhost:8081/api/v1/echo/test"
+
+curl -X POST -d'{"command": "test"}' http://localhost:8081/api/v1/getUser
+
+curl -X POST -d'{"command": "First"}' http://localhost:8081/api/v1/getUser
+
+netstat -lpnt
