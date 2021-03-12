@@ -6,7 +6,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Fri Mar 12 09:37:22 2021
+# Make data base, printed on Fri Mar 12 11:00:56 2021
 
 # Variables
 
@@ -39,13 +39,15 @@ GDMSESSION = ubuntu
 # environment
 XMODIFIERS = @im=ibus
 # makefile
-CURDIR := /home/quangnt/Desktop/gotraining/zmq
+CURDIR := /home/quangnt/Desktop/mygitwork/gotraining/zmq
 # makefile
 SHELL = /bin/sh
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
 # environment
 _ = /usr/share/code/code
+# environment
+JOURNAL_STREAM = 9:53885
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
 # makefile (from 'Makefile', line 1)
@@ -64,6 +66,8 @@ XDG_DATA_DIRS = /usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/d
 DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus
 # environment
 VSCODE_LOGS = /home/quangnt/.config/Code/logs/20210312T093719
+# environment
+MANAGERPID = 3968
 # environment
 CLUTTER_IM_MODULE = xim
 # environment
@@ -98,6 +102,8 @@ XDG_MENU_PREFIX = gnome-
 VSCODE_LOG_STACK = false
 # environment
 ELECTRON_RUN_AS_NODE = 1
+# environment
+INVOCATION_ID = cc3023465e5d4b6cb8c140329aea9a12
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -115,7 +121,7 @@ DISPLAY = :0
 # environment
 GTK_IM_MODULE = ibus
 # environment
-PWD = /home/quangnt/Desktop/gotraining/zmq
+PWD = /home/quangnt/Desktop/mygitwork/gotraining/zmq
 # environment
 XDG_SEAT = seat0
 # environment
@@ -161,7 +167,7 @@ SHLVL = 1
 # environment
 GNOME_SHELL_SESSION_MODE = ubuntu
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-c279d89b-618c-474c-8075-febfdb2e562b.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-2bb58c7b-26e7-41f9-a268-00f20d1ddecc.sock
 # environment
 XDG_SESSION_ID = 2
 # environment
@@ -205,6 +211,8 @@ BREAKPAD_DUMP_LOCATION = /home/quangnt/.config/Code/exthost Crash Reports
 # environment
 LC_PAPER = vi_VN
 # environment
+NO_AT_BRIDGE = 1
+# environment
 QT_ACCESSIBILITY = 1
 # environment
 TEXTDOMAINDIR = /usr/share/locale/
@@ -216,6 +224,8 @@ LC_NUMERIC = vi_VN
 <F = $(notdir $<)
 # environment
 LC_MEASUREMENT = vi_VN
+# environment
+DBUS_STARTER_BUS_TYPE = session
 # environment
 QT4_IM_MODULE = xim
 # environment
@@ -240,8 +250,10 @@ LC_ADDRESS = vi_VN
 LANG = en_US.UTF-8
 # environment
 VSCODE_PID = 11175
+# environment
+DBUS_STARTER_ADDRESS = unix:path=/run/user/1000/bus,guid=2f4a5f4de39a20635440d47a604acb65
 # variable set hash-table stats:
-# Load=115/1024=11%, Rehash=0, Collisions=29/143=20%
+# Load=121/1024=12%, Rehash=0, Collisions=30/149=20%
 
 # Pattern-specific Variable Values
 
@@ -249,7 +261,7 @@ VSCODE_PID = 11175
 
 # Directories
 
-# . (device 66310, inode 13639209): 12 files, no impossibilities.
+# . (device 66310, inode 22283652): 12 files, no impossibilities.
 
 # 12 files, no impossibilities in 1 directories.
 
@@ -265,6 +277,7 @@ all: build-mtserver
 #  File does not exist.
 #  File has been updated.
 #  Needs to be updated (-q is set).
+ 
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/3=0%
 
@@ -284,7 +297,6 @@ build-mtserver:
 # + := 
 # automatic
 # | := 
- 
 # automatic
 # < := 
 # automatic
@@ -305,7 +317,7 @@ build-mtserver:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2021-03-11 17:02:25.188269364
+#  Last modified 2021-03-12 10:57:30.030357075
 #  File has been updated.
 #  Successfully updated.
 
@@ -359,6 +371,6 @@ init-project:
 # strcache performance: lookups = 35 / hit rate = 37%
 # hash-table stats:
 # Load=22/8192=0%, Rehash=0, Collisions=1/35=3%
-# Finished Make data base on Fri Mar 12 09:37:22 2021
+# Finished Make data base on Fri Mar 12 11:00:56 2021
 
  

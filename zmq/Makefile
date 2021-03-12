@@ -4,8 +4,9 @@ init-project:
 	@go mod init zmq
 
 install-pkg: #install tools
-	go get -u github.com/pebbe/zmq4
-
+	@go get -u github.com/pebbe/zmq4
+	@go get -u gopkg.in/yaml.v2
+	
 build-mtserver:
 	@go build -o mtserver mtserver.go
 
