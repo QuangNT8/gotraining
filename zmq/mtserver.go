@@ -13,6 +13,9 @@ import (
 	"fmt"
 	"sync"
 	"zmq/config"
+	"zmq/db"
+
+	// "zmq/db"
 
 	// zmq "github.com/alecthomas/gozmq"
 
@@ -20,7 +23,7 @@ import (
 )
 
 func main() {
-	var wg sync.WaitGroup
+	// var wg sync.WaitGroup
 
 	// load config
 	err := config.NewConfig("./config.yml")
@@ -28,31 +31,42 @@ func main() {
 		panic(err)
 	}
 
-	getconfig := config.GetDbUrl()
+	dburl := config.GetDbUrl()
 
-	fmt.Println("Host: ", getconfig["Host"])
-	fmt.Println("Name: ", getconfig["Name"])
+	fmt.Println("Host: ", dburl["Host"])
+	fmt.Println("Name: ", dburl["Name"])
+	fmt.Println("User: ", dburl["User"])
+	fmt.Println("Password: ", dburl["Password"])
+	// if *purgeDB {
+	// 	db.PurgeDB(dburl)
+	// }
 
-	//  Frontend socket talks to clients over ipc
-	frontend, _ := zmq.NewSocket(zmq.ROUTER)
-	defer frontend.Close()
-	frontend.Bind("ipc:///tmp/zmq_server.ipc")
-
-	//  Backend socket talks to workers over inproc
-	backend, _ := zmq.NewSocket(zmq.DEALER)
-	defer backend.Close()
-	backend.Bind("inproc://backend")
-
-	// Launch pool of worker threads
-	for i := 0; i != 5; i = i + 1 {
-		go worker(&wg, i)
+	if err := db.CreateDatabase(dburl); err != nil {
+		panic(err)
 	}
 
-	//  Connect backend to frontend via a proxy
-	err = zmq.Proxy(frontend, backend, nil)
-	fmt.Println("Proxy interrupted:", err)
+	// mysql.CreateDatabase()
+	/*
+		//  Frontend socket talks to clients over ipc
+		frontend, _ := zmq.NewSocket(zmq.ROUTER)
+		defer frontend.Close()
+		frontend.Bind("ipc:///tmp/zmq_server.ipc")
 
-	wg.Wait()
+		//  Backend socket talks to workers over inproc
+		backend, _ := zmq.NewSocket(zmq.DEALER)
+		defer backend.Close()
+		backend.Bind("inproc://backend")
+
+		// Launch pool of worker threads
+		for i := 0; i != 5; i = i + 1 {
+			go worker(&wg, i)
+		}
+
+		//  Connect backend to frontend via a proxy
+		err = zmq.Proxy(frontend, backend, nil)
+		fmt.Println("Proxy interrupted:", err)
+
+		wg.Wait() */
 }
 
 func worker(wg *sync.WaitGroup, workerID int) {
