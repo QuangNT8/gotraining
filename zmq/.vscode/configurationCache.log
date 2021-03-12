@@ -1,0 +1,1 @@
+{"buildTargets":["all","build-mtserver","clean","init-project","install-pkg","run"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}

@@ -1,0 +1,6 @@
+database:
+  db_host: localhost:3310
+  db_user: quang
+  db_name: quang
+  db_userpasswd: abc123456
+  db_type: mysql

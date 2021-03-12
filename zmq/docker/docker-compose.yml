@@ -1,0 +1,47 @@
+version: '3.5'
+volumes:
+  prometheus_data: {}
+
+networks:
+  back-tier:
+    driver: bridge
+
+services:
+
+  quang-database-dev:
+    image: mariadb
+    container_name: quang-database-dev
+    environment:
+      MYSQL_ROOT_PASSWORD: abc123
+      MYSQL_USER: quang
+      MYSQL_PASSWORD: abc123456
+      MYSQL_DATABASE: quang
+    volumes:
+      - /home/quangnt/mysql:/var/lib/quangsql
+    ports:
+      - 3310:3306
+    restart: always
+    networks:
+      - back-tier
+
+  # keystone-cache:
+  #   image: memcached
+  #   container_name: keystone-cache
+  # keystone-database:
+  #   image: mariadb
+  #   container_name: keystone-database
+  #   volumes:
+  #     - /home/stack/keystone-data:/var/lib/mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: abc123
+  #     MYSQL_USER: keystone
+  #     MYSQL_PASSWORD: abc123
+  #     MYSQL_DATABASE: keystone
+  #   ports:
+  #     - 3306
+  #   networks:
+  #     - back-tier
+ 
+
+ 
+ 
