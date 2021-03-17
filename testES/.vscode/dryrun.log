@@ -1,5 +1,0 @@
-make --dry-run --always-make --keep-going --print-directory
-make: Entering directory '/home/quangnt/Desktop/mygitwork/testES'
-go build -o estest estest.go
-make: Leaving directory '/home/quangnt/Desktop/mygitwork/testES'
- 
