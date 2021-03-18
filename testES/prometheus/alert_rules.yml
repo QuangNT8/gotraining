@@ -1,0 +1,543 @@
+groups:
+- name: blacklisted_country
+  rules:
+  - alert: Detect black list countries
+    expr: irate(blacklisted_country{}[5m]) > 0
+    labels:
+      severity: High
+    annotations:
+      category: Network
+      country: '{{$labels.country}}'
+      description: Trigger an alert when hosts contact or are contacted by the specified
+        countries
+      host: '{{$labels.host}}'
+      summary: Total packets is `{{humanize $value}}pps`
+      threshold: 0 pps
+      type: Flow
+- name: blacklisted_flow
+  rules:
+  - alert: Detect blacklisted flow
+    expr: delta(blacklisted_flow{}[5m]) > 0
+    labels:
+      severity: High
+    annotations:
+      category: Network
+      description: Trigger an alert when a blacklisted host or domain is detected
+      detail: flow_community_id {{$labels.community_id}} from ip {{$labels.src_ip}}
+        to ip {{$labels.dst_ip}}
+      summary: Total Sent and Received Bytes is `{{humanize $value}}Mb`
+      threshold: 0 Mb
+      type: Flow
+- name: device_application_not_allowed
+  rules:
+  - alert: Detect application not allowed
+    expr: delta(device_app_not_allowed{}[5m]) > 0
+    labels:
+      severity: High
+    annotations:
+      category: Network
+      description: Trigger an alert when an unusual application is detected for a
+        device
+      detail: 'flow_community_id {{$labels.community_id}} from ip {{$labels.client}}
+        to ip {{$labels.server}} trigger as client: {{$labels.trigger_as_client}}
+        trigger as server: {{$labels.trigger_as_server}}'
+      summary: Total Sent and Received Bytes is `{{humanize $value}}Mb`
+      threshold: 0 Mb
+      type: Flow
+- name: web_mining
+  rules:
+  - alert: Detect web mining
+    expr: sum_over_time(flow_stats{category="Mining"}[5m]) > 0
+    labels:
+      severity: High
+    annotations:
+      category: Security
+      description: Toggle alerts generated when traffic from/to hosts known to perform
+        cryptocurrencies mining is detected
+      detail: flow_community_id {{$labels.community_id}} from ip {{$labels.src_ip}}
+        to ip {{$labels.dest_ip}} application proto {{$labels.app_proto}}
+      summary: Total Sent and Received Bytes is ``{{humanize $value}}Mb`
+      threshold: 0 Mb
+      type: Flow
+- name: unidirectional_udp_flow
+  rules:
+  - alert: Detect unidirectional udp flow
+    expr: sum_over_time(flow_stats{proto="17", app_proto !~"MDNS|Syslog|DHCP|RTP|DHCPV6|NetFlow|sFlow"}[5m])
+      > 0
+    labels:
+      severity: Medium
+    annotations:
+      category: Security
+      description: Toggle alerts generated when traffic from/to hosts known to perform
+        cryptocurrencies mining is detected
+      detail: flow_community_id {{$labels.community_id}} from ip {{$labels.src_ip}}
+        to ip {{$labels.dest_ip}} application proto {{$labels.app_proto}}
+      summary: Total Sent and Received Bytes is ``{{humanize $value}}Mb`
+      threshold: 0 Mb
+      type: Flow
+- name: remote_to_remote
+  rules:
+  - alert: Detect remote to remote flow
+    expr: sum_over_time(flow_stats{remote2remote_flow="true"}[5m]) > 0
+    labels:
+      severity: Low
+    annotations:
+      category: Security
+      description: Trigger an alert when a unidirectional UDP flow is detected
+      detail: flow_community_id {{$labels.community_id}} from ip {{$labels.src_ip}}
+        to ip {{$labels.dest_ip}} application proto {{$labels.app_proto}}
+      summary: Total Sent and Received Bytes is ``{{humanize $value}}Mb`
+      threshold: 0 Mb
+      type: Flow
+- name: flow_risks
+  rules:
+  - alert: Detect flow risks
+    expr: sum_over_time(flow_stats{risks !=""}[5m]) > 0
+    labels:
+      severity: High
+    annotations:
+      category: Security
+      description: 'Evaluate flow risks reported by nDPI: {{$labels.risks}}'
+      detail: flow_community_id {{$labels.community_id}} from ip {{$labels.src_ip}}
+        to ip {{$labels.dest_ip}} application proto {{$labels.app_proto}}
+      summary: Total Sent and Received Bytes is ``{{humanize $value}}Mb`
+      threshold: 0 Mb
+      type: Flow
+- name: host_dns_traffic_alert
+  rules:
+  - alert: High Sent and Received DNS Traffic from a Host
+    expr: delta(host_ndpi_traffic{protocol="DNS"}[5m])/1024/1024 > 50
+    labels:
+      severity: High
+    annotations:
+      category: Network
+      description: Trigger an alert when layer 2 Bytes delta (sent + received) for
+        DNS traffic exceeds the threshold
+      host: '{{$labels.host}}'
+      summary: Total Sent and Received Bytes is `{{humanize $value}}Mb`
+      threshold: 50 Mb
+      type: Host
+- name: host_flow_flood_attacker_alert
+  rules:
+  - alert: Flow Flood Attacker Alert
+    expr: irate(host_total_flows_client[5m]) > 50
+    labels:
+      severity: High
+    annotations:
+      category: Security
+      description: Trigger an alert when the new client Flows/sec exceeds the threshold
+      host: '{{$labels.host}}'
+      summary: Client Flows/sec is `{{humanize $value}}`
+      threshold: 50 flows/sec
+      type: Host
+- name: host_flow_flood_victim_alert
+  rules:
+  - alert: Flow Flood Victim Alert
+    expr: irate(host_total_flows_server[5m]) > 50
+    labels:
+      severity: High
+    annotations:
+      category: Security
+      description: Trigger an alert when the new Server Flows/sec exceeds the threshold
+      host: '{{$labels.host}}'
+      summary: Server Flows/sec is `{{humanize $value}}`
+      threshold: 50 flows/sec
+      type: Host
+- name: host_flows_alert
+  rules:
+  - alert: Flow Alert
+    expr: host_total_flows > 50000
+    labels:
+      severity: High
+    annotations:
+      category: Network
+      description: Trigger an alert when the Flows delta (as client + as server) exceeds
+        the threshold
+      flows_as_client: '{{$labels.flows_as_client}}'
+      flows_as_server: '{{$labels.flows_as_server}}'
+      host: '{{$labels.host}}'
+      summary: Total Flows is `{{humanize $value}}`
+      threshold: 50000 flows
+      type: Host
+- name: host_idle_time_alert
+  rules:
+  - alert: Idle Time Alert
+    expr: ceil(time() - host_last_act_time)/60/60 > 1
+    labels:
+      severity: Low
+    annotations:
+      category: Network
+      description: Trigger an alert when the Idle time (time since last packet seen)
+        exceeds the threshold
+      host: '{{$labels.host}}'
+      summary: Idle Time is `{{humanize $value}}s`
+      threshold: 1 h
+      type: Host
+- name: host_p2p_traffic_alert
+  rules:
+  - alert: P2P Traffic Alert
+    expr: delta(host_ndpi_traffic{protocol="P2P"}[5m])/1024/1024 > 50
+    labels:
+      severity: Medium
+    annotations:
+      category: Network
+      description: Trigger an alert when the Layer 2 bytes delta (sent + received)
+        for P2P traffic exceeds the threshold
+      host: '{{$labels.host}}'
+      summary: Total Sent and Received Bytes is `{{humanize $value}}Mb`
+      threshold: 50 Mb
+      type: Host
+- name: host_packets_alert
+  rules:
+  - alert: Packets Alert
+    expr: delta(host_total_packets[5m]) > 50
+    labels:
+      severity: High
+    annotations:
+      category: Network
+      description: Trigger an alert when the Packets delta (sent + received) exceeds
+        the threshold
+      host: '{{$labels.host}}'
+      summary: Total Sent and Received Packets delta is `{{humanize $value}}`
+      threshold: 50 Packets
+      type: Host
+- name: host_syn_flood_attacker_alert
+  rules:
+  - alert: SYN Flood Attacker Alert
+    expr: rate(host_tcpflag_packets_client{tcpflags="SYN"}[5m]) > 50
+    labels:
+      severity: High
+    annotations:
+      category: Security
+      description: Trigger an alert when the number of sent SYNs/sec exceeds the threshold
+      host: '{{$labels.host}}'
+      summary: 'SYNs/sec (Minute) : `{{humanize $value}}`'
+      threshold: 50 SYNs/sec (Minute)
+      type: Host
+- name: host_syn_flood_victim_alert
+  rules:
+  - alert: SYN Flood Victim Alert
+    expr: rate(host_tcpflag_packets_server{tcpflags="SYN"}[5m]) > 50
+    labels:
+      severity: High
+    annotations:
+      category: Security
+      description: Trigger an alert when the number of Received SYNs/sec exceeds the
+        threshold
+      host: '{{$labels.host}}'
+      summary: 'SYNs/sec (Minute) : `{{humanize $value}}`'
+      threshold: 50 SYNs/sec (Minute)
+      type: Host
+- name: host_syn_scan_attacker_alert
+  rules:
+  - alert: SYN Scan Attacker Alert
+    expr: rate(host_tcpflag_packets_client{tcpflags="SYN"}[5m])*60 > 50
+    labels:
+      severity: High
+    annotations:
+      category: Security
+      description: Trigger an alert when the number of sent SYNs/min (with no response)
+        exceeds the threshold
+      host: '{{$labels.host}}'
+      summary: 'SYNs/min (Minute) : `{{humanize $value}}`'
+      threshold: 50 SYNs/min (Minute)
+      type: Host
+- name: host_syn_scan_victim_alert
+  rules:
+  - alert: SYN Scan Victim Alert
+    expr: rate(host_tcpflag_packets_server{tcpflags="SYN"}[5m])*60 > 30
+    labels:
+      severity: High
+    annotations:
+      category: Security
+      description: Trigger an alert when the number of received SYNs/min (with no
+        response) exceeds the threshold
+      host: '{{$labels.host}}'
+      summary: 'SYNs/min (Minute) : `{{humanize $value}}`'
+      threshold: 30 SYNs/min (Minute)
+      type: Host
+- name: host_throughput_alert
+  rules:
+  - alert: Throughput Alert
+    expr: host_throughput/1024 > 10
+    labels:
+      severity: High
+    annotations:
+      category: Security
+      description: Trigger an alert when the Average throughput (sent + received)
+        exceeds the threshold
+      host: '{{$labels.host}}'
+      summary: 'Throughput : `{{humanize $value}}KB/s`'
+      threshold: 10 KB/s
+      type: Host
+- name: host_traffic_alert
+  rules:
+  - alert: Traffic Alert
+    expr: delta(host_traffic[1h])/1024/1024 > 10
+    labels:
+      severity: High
+    annotations:
+      category: Security
+      description: Trigger an alert when the Layer 2 bytes delta (sent + received)
+        exceeds the threshold
+      host: '{{$labels.host}}'
+      summary: 'Delta Bytes (sent + received) : `{{humanize $value}}MB`'
+      threshold: 10 MB
+      type: Host
+- name: iface_dns_traffic_alert
+  rules:
+  - alert: Iface DNS Traffic Alert
+    expr: delta(iface_ndpi{protocol=~"DNS.*"}[1h])/1024/1024 > 10
+    labels:
+      severity: High
+    annotations:
+      category: Network
+      description: Trigger an alert when layer 2 Bytes delta (sent + received) for
+        DNS traffic exceeds the threshold
+      interface: '{{$labels.device}}'
+      protocol: '{{$labels.protocol}}'
+      summary: 'Delta Bytes (sent + received) : `{{humanize $value}}`'
+      threshold: 10 MB
+      type: Interface
+- name: iface_packets_drops_alert
+  rules:
+  - alert: Iface Interface Packets Drops Alert
+    expr: iface_drop_packets*100/iface_packets > 5
+    labels:
+      severity: High
+    annotations:
+      category: System
+      description: The maximum percentage of dropped packets over the total number
+        of interface observed packets
+      interface: '{{$labels.device}}'
+      summary: 'The percentage of dropped packets : `{{humanize $value}}`'
+      threshold: 5 %
+      type: Interface
+- name: iface_p2p_traffic_alert
+  rules:
+  - alert: Iface P2P Traffic Alert
+    expr: delta(iface_ndpi{protocol=~"P2P.*"}[1h])/1024/1024 > 10
+    labels:
+      severity: Medium
+    annotations:
+      category: Network
+      description: Trigger an alert when the Layer 2 bytes delta (sent + received)
+        for P2P traffic exceeds the threshold
+      interface: '{{$labels.device}}'
+      protocol: '{{$labels.protocol}}'
+      summary: 'Delta Bytes (sent + received) : `{{humanize $value}}`'
+      threshold: 10 MB
+      type: Interface
+- name: iface_packets_alert
+  rules:
+  - alert: Iface Packets Alert
+    expr: delta(iface_packets[5m]) > 10000
+    labels:
+      severity: High
+    annotations:
+      category: Network
+      description: Trigger an alert when the Packets delta (sent + received) exceeds
+        the threshold
+      interface: '{{$labels.device}}'
+      summary: 'the Packets delta : `{{humanize $value}}`'
+      threshold: 10000 packets
+      type: Interface
+- name: iface_throughput_alert
+  rules:
+  - alert: Iface Throughput Alert
+    expr: avg_over_time(iface_throughput[5m])/1024 > 10
+    labels:
+      severity: High
+    annotations:
+      category: Network
+      description: Trigger an alert when the Average throughput (sent + received)
+        exceeds the threshold
+      interface: '{{$labels.device}}'
+      summary: 'the Packets delta : `{{humanize $value}}`'
+      threshold: 10 MB/s
+      type: Interface
+- name: iface_too_many_flows_alert
+  rules:
+  - alert: Iface Too Many Flows Alert
+    expr: iface_tot_flows > 1000000
+    labels:
+      severity: High
+    annotations:
+      category: Internals
+      description: Trigger an alert when the number of active flows is too high
+      interface: '{{$labels.device}}'
+      summary: 'Total Flows : `{{humanize $value}} flows`'
+      threshold: 1000000 flows
+      type: Interface
+- name: iface_too_many_hosts_alert
+  rules:
+  - alert: Iface Too Many Hosts Alert
+    expr: iface_hosts > 100000
+    labels:
+      severity: High
+    annotations:
+      category: Internals
+      description: Trigger an alert when the number of active Hosts is too high
+      interface: '{{$labels.device}}'
+      summary: 'Total Hosts : `{{humanize $value}} Hosts`'
+      threshold: 100000 Hosts
+      type: Interface
+- name: iface_traffic_alert
+  rules:
+  - alert: Iface Traffic Alert
+    expr: delta(iface_traffic[1h])/1024/1024 > 50
+    labels:
+      severity: High
+    annotations:
+      category: Network
+      description: Trigger an alert when the Layer 2 bytes delta (sent + received)
+        exceeds the threshold
+      interface: '{{$labels.device}}'
+      summary: Total Sent and Received Bytes is `{{humanize $value}}Mb`
+      threshold: 50 Mb
+      type: Interface
+- name: local_networks_egress_traffic_alert
+  rules:
+  - alert: Local Networks Egress Traffic Alert
+    expr: sum(host_sent_bytes{location="Local"})/1024/1024 > 50
+    labels:
+      severity: High
+    annotations:
+      category: Network
+      description: Trigger an alert when the Egress Bytes delta exceeds the threshold
+      summary: Total Sent Bytes is `{{humanize $value}}Mb`
+      threshold: 50 Mb
+      type: Local Network
+- name: local_networks_flow_flood_victim_alert
+  rules:
+  - alert: Local Networks Flow Flood Victim Alert
+    expr: sum(irate(host_total_flows_server{location="Local"}[5m])) > 1000
+    labels:
+      severity: High
+    annotations:
+      category: Network
+      description: Trigger an alert when the new server Flows/sec exceeds the threshold
+      summary: 'Server Flows/sec : `{{humanize $value}}`'
+      threshold: 1000 flows/s
+      type: Local Network
+- name: local_networks_ingress_traffic_alert
+  rules:
+  - alert: Local Networks Ingress Traffic Alert
+    expr: sum(host_recv_bytes{location="Local"})/1024/1024 > 50
+    labels:
+      severity: High
+    annotations:
+      category: Network
+      description: Trigger an alert when the Ingress Bytes delta exceeds the threshold
+      summary: Total Received Bytes is `{{humanize $value}}Mb`
+      threshold: 50 Mb
+      type: Local Network
+- name: local_networks_inner_traffic_alert
+  rules:
+  - alert: Local Networks Inner Traffic Alert
+    expr: sum(host_traffic{location="Local"})/1024/1024 > 50
+    labels:
+      severity: Medium
+    annotations:
+      category: Network
+      description: Trigger an alert when the Inner Bytes delta exceeds the threshold
+      summary: 'Total Sent & Rcvd Bytes : `{{humanize $value}}Mb`'
+      threshold: 50 Mb
+      type: Local Network
+- name: local_networks_syn_flood_victim_alert
+  rules:
+  - alert: Local Networks SYN Flood Victim Alert
+    expr: rate(host_tcpflag_packets_server{tcpflags="SYN",location="Local"}[5m]) >
+      50
+    labels:
+      severity: High
+    annotations:
+      category: Security
+      description: Trigger an alert when the number of received SYNs/sec exceeds the
+        threshold
+      summary: 'SYNs/sec (Minute) : `{{humanize $value}}`'
+      threshold: 50 SYNs/sec (Minute)
+      type: Local Network
+- name: local_networks_syn_scan_victim_alert
+  rules:
+  - alert: Local Networks SYN Scan Victim Alert
+    expr: rate(host_tcpflag_packets_server{tcpflags="SYN",location="Local"}[5m])*60
+      > 30
+    labels:
+      severity: High
+    annotations:
+      category: Security
+      description: Trigger an alert when the number of received SYNs/min (with no
+        response) exceeds the threshold
+      summary: 'SYNs/min (Minute) : `{{humanize $value}}`'
+      threshold: 30 SYNs/min (Minute)
+      type: Local Network
+- name: disk_usage
+  rules:
+  - alert: Low data disk space
+    expr: ceil(((node_filesystem_size_bytes{mountpoint!="/boot"} - node_filesystem_free_bytes{mountpoint!="/boot"})
+      / node_filesystem_size_bytes{mountpoint!="/boot"} * 100)) > 95
+    labels:
+      severity: Critical
+    annotations:
+      category: System
+      description: 'Partition : {{$labels.mountpoint}}'
+      host: '{{$labels.instance}}'
+      summary: Disk usage is `{{humanize $value}}%`
+      threshold: 90%
+      type: Internal
+- name: memory_usage
+  rules:
+  - alert: High memory usage
+    expr: ceil((((node_memory_MemTotal_bytes - node_memory_MemFree_bytes - node_memory_Buffers_bytes
+      - node_memory_Cached_bytes) / node_memory_MemTotal_bytes) * 100)) > 80
+    labels:
+      severity: Critical
+    annotations:
+      category: System
+      description: Memory usage threshold set to `80%`.
+      host: '{{$labels.instance}}'
+      summary: Memory usage is `{{humanize $value}}%`
+      threshold: 80%
+      type: Internal
+- name: user_activities
+  rules:
+  - alert: user activities
+    expr: user_activities{type="User"} > 0
+    labels:
+      severity: High
+    annotations:
+      category: System
+      description: '{{$labels.user}} {{$labels.method}} from {{$labels.from_ip}} status:
+        {{$labels.status}} with detail message: {{$labels.detail}}'
+      summary: '{{$labels.user}} {{$labels.method}} status: {{$labels.status}}'
+      threshold: "0"
+      type: User
+- name: system_activities
+  rules:
+  - alert: system activities
+    expr: user_activities{type="System"} > 0
+    labels:
+      severity: Low
+    annotations:
+      category: System
+      description: '{{$labels.user}} {{$labels.method}} from {{$labels.from_ip}} status:
+        {{$labels.status}} with detail message: {{$labels.detail}}'
+      summary: '{{$labels.user}} {{$labels.method}} from {{$labels.from_ip}} status:
+        {{$labels.status}}'
+      threshold: "0"
+      type: System
+- name: security_activities
+  rules:
+  - alert: security activities
+    expr: security_activities{type="Security"} > 0
+    labels:
+      severity: Medium
+    annotations:
+      category: System
+      description: '{{$labels.user}} {{$labels.method}} from {{$labels.from_ip}} status:
+        {{$labels.status}} with detail message: {{$labels.detail}}'
+      summary: '{{$labels.user}} {{$labels.method}} from {{$labels.from_ip}} status:
+        {{$labels.status}}'
+      threshold: "0"
+      type: Security
